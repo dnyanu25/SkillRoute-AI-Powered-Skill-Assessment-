@@ -2,7 +2,7 @@
 # SkillRoute 🚀
 
 An AI-powered learning platform that creates personalized roadmaps to help you master any skill. Built with React, powered by Groq AI.
-
+ 
 <!-- ![SkillRoute Banner](./public/assets/banner.png)-->
 
 ## ✨ Features
