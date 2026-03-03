@@ -28,7 +28,7 @@ An AI-powered learning platform that creates personalized roadmaps to help you m
 
 ### AI & Backend
 - **Groq API** - AI roadmap generation (Llama 3.1)
-- **Spring Boot** - Backend API *(coming soon)*
+- **Spring Boot** - Backend API 
 - **PostgreSQL** - Database *(coming soon)*
 
 ## 🚀 Getting Started
