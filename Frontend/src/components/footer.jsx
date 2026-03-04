@@ -14,7 +14,7 @@ export default function Footer() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-        >
+        > 
             <a href="/">
                 <img src='/assets/favcon1.svg' alt='logo' className='h-8.5 w-auto' width={205} height={48} />
             </a>

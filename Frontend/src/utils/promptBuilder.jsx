@@ -8,7 +8,7 @@ export const buildRoadmapPrompt = (userInfo) => {
     
     // Build additional requirements
     const requirements = [];
-    if (includePractice) requirements.push('- Include practice questions for each topic');
+    if (includePractice) requirements.push('- Include practice questions for each topic'); 
     if (includeProjects) requirements.push('- Include mini projects to apply learned concepts');
     if (includeRevision) requirements.push('- Include revision periods to reinforce learning');
     
