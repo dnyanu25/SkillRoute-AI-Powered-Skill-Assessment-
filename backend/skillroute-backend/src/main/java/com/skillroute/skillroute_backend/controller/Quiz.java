@@ -1,9 +1,9 @@
 package com.skillroute.skillroute_backend.controller;
 
-import com.skillroute.skillroute_backend.dto.request.EvaluateRequest;
-import com.skillroute.skillroute_backend.dto.request.QuizRequest;
-import com.skillroute.skillroute_backend.dto.response.EvaluateResponse;
-import com.skillroute.skillroute_backend.dto.response.QuizResponse;
+import com.skillroute.skillroute_backend.dto.request.EvaluateReq;
+import com.skillroute.skillroute_backend.dto.request.QuizReq;
+import com.skillroute.skillroute_backend.dto.response.EvaluateRes;
+import com.skillroute.skillroute_backend.dto.response.QuizRes;
 import com.skillroute.skillroute_backend.service.QuizService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +22,10 @@ public class Quiz {
      * Returns AI generated quiz
      * Mirrors: generateQuiz(skill, difficulty, questionCount) in React */
     @PostMapping("/generate")
-    public ResponseEntity<QuizResponse> generateQuiz(
-            @RequestBody QuizRequest request) {
+    public ResponseEntity<QuizRes> generateQuiz(
+            @RequestBody QuizReq request) {
         try {
-            QuizResponse response = quizService.generateQuiz(request);
+            QuizRes response = quizService.generateQuiz(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -37,10 +37,10 @@ public class Quiz {
      * Returns score, level and reasoning
      * Mirrors: evaluateQuiz(quizData, userAnswers) in React */
     @PostMapping("/evaluate")
-    public ResponseEntity<EvaluateResponse> evaluateQuiz(
-            @RequestBody EvaluateRequest request) {
+    public ResponseEntity<EvaluateRes> evaluateQuiz(
+            @RequestBody EvaluateReq request) {
         try {
-            EvaluateResponse response = quizService.evaluateQuiz(request);
+            EvaluateRes response = quizService.evaluateQuiz(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -63,7 +63,7 @@ public class Quiz {
     /* GET /api/quiz/{id}
      * Returns a specific quiz by ID */
     @GetMapping("/{id}")
-    public ResponseEntity<QuizResponse> getQuizById(
+    public ResponseEntity<QuizRes> getQuizById(
             @PathVariable Long id) {
         try {
             return ResponseEntity.ok(
