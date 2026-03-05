@@ -15,9 +15,9 @@ export default function Footer() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
         > 
-            <a href="/">
+            {/* <a href="/">
                 <img src='/assets/favcon1.svg' alt='logo' className='h-8.5 w-auto' width={205} height={48} />
-            </a>
+            </a> */}
 
             <div className="flex flex-wrap items-center justify-center gap-8 py-8">
                 {links.map((link, index) => (

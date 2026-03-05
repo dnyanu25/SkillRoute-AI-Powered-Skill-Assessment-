@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Calendar, CheckCircle2, Circle, ChevronLeft, ChevronRight } from 'lucide-react';
-
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 // Component imports
 import SkillDiscovery from './skillDiscovery';
 import Quiz from './Quiz';
@@ -10,9 +11,16 @@ import PreferencesForm from './preferencesForm';
 import { generateRoadmap } from '../services/aiService';
 
 export default function GetStarted() {
-    // Step management
+    const [searchParams] = useSearchParams();
     const [currentStep, setCurrentStep] = useState(1);
     
+    // Auto-start quiz if URL has ?startQuiz=true
+    useEffect(() => {
+        if (searchParams.get('startQuiz') === 'true') {
+            setUserInfo({ ...userInfo, skill: 'Demo', level: 'Not sure' });
+            setCurrentStep(2); // Go directly to quiz
+        }
+    }, [searchParams]);
     // User data
     const [userInfo, setUserInfo] = useState({
         skill: '',

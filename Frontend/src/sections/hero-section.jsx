@@ -73,12 +73,18 @@ export default function HeroSection() {
                 >
                     <button className="btn max-md:w-full glass py-3 px-6 flex items-center justify-center gap-2 hover:scale-105 transition-transform">
                         <CompassIcon className="size-4.5" />
+
+                        <Link to="/get-started" className="">
                         Find Your Path
+                    </Link>
+                        
                     </button>
-                    <button className="btn max-md:w-full glass flex items-center justify-center gap-2 py-3 px-6 hover:scale-105 transition-transform">
-                        <PlayCircleIcon className="size-4.5" />
-                        Watch Demo
-                    </button>
+                    <Link to="/get-started?startQuiz=true">
+    <button className="btn max-md:w-full glass flex items-center justify-center gap-2 py-3 px-6 hover:scale-105 transition-transform">
+        <PlayCircleIcon className="size-4.5" />
+        Take a Quiz
+    </button>
+</Link>
                 </motion.div>
 
                 {/* Optional: Trust indicators */}

@@ -107,9 +107,9 @@ export const evaluateQuiz = async (quizData, userAnswers) => {
         /* Convert userAnswers array to map
          * matching Map<Integer, Integer> in Java */
         const userAnswersMap = {};
-        Object.keys(userAnswers).forEach((index) => {
-            userAnswersMap[parseInt(index)] = userAnswers[index];
-        });
+       quizData.questions.forEach((question, index) => {
+    userAnswersMap[question.id] = userAnswers[index];
+});
 
         const response = await apiClient.post('/api/quiz/evaluate', {
             totalQuestions: quizData.questions.length,

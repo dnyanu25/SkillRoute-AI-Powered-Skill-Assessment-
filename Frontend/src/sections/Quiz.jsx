@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { ArrowRight, CheckCircle2, XCircle, ArrowLeft } from 'lucide-react';
+import { ArrowRight, CheckCircle2, XCircle, ArrowLeft, FileText } from 'lucide-react';
 import { generateQuiz, evaluateQuiz } from '../services/aiService';
+import QuizAnalysis from './QuizAnalysis';
 
 export default function Quiz({ skill, onComplete, onBack }) {
-    const [quizState, setQuizState] = useState('setup'); // 'setup', 'loading', 'quiz', 'results'
+    const [quizState, setQuizState] = useState('setup'); // 'setup', 'loading', 'quiz', 'results', 'analysis'
     const [difficulty, setDifficulty] = useState(3);
     const [questionCount, setQuestionCount] = useState(10);
     const [quizData, setQuizData] = useState(null);
@@ -30,14 +31,28 @@ export default function Quiz({ skill, onComplete, onBack }) {
         });
     };
 
-    const handleSubmitQuiz = () => {
-        const evaluation = evaluateQuiz(quizData, userAnswers);
-        setResults(evaluation);
-        setQuizState('results');
+    const handleSubmitQuiz = async () => {
+        try {
+            const evaluation = await evaluateQuiz(quizData, userAnswers);
+            console.log('Evaluation result:', evaluation);
+            setResults(evaluation);
+            setQuizState('results');
+        } catch (error) {
+            console.error('Quiz evaluation error:', error);
+            alert('Error evaluating quiz. Please try again!');
+        }
     };
 
     const handleCompleteQuiz = () => {
         onComplete({ level: results.level });
+    };
+
+    const handleShowAnalysis = () => {
+        setQuizState('analysis');
+    };
+
+    const handleBackToResults = () => {
+        setQuizState('results');
     };
 
     // Setup Screen
@@ -257,17 +272,36 @@ export default function Quiz({ skill, onComplete, onBack }) {
                         <p className="text-gray-300">{results.reasoning}</p>
                     </div>
 
-                    {/* Continue Button */}
-                    <button
-                        onClick={handleCompleteQuiz}
-                        className="btn bg-blue-600 hover:bg-blue-700 w-full py-3 flex items-center justify-center gap-2"
-                    >
-                        Continue to Preferences <ArrowRight className="w-5 h-5" />
-                    </button>
+                    {/* Action Buttons */}
+                    <div className="space-y-3">
+                        <button
+                            onClick={handleShowAnalysis}
+                            className="btn bg-blue-600 hover:bg-blue-700 w-full py-3 flex items-center justify-center gap-2"
+                        >
+                            <FileText className="w-5 h-5" /> View Detailed Analysis
+                        </button>
+                        <button
+                            onClick={handleCompleteQuiz}
+                            className="btn bg-blue-600 hover:bg-blue-700 w-full py-3 flex items-center justify-center gap-2"
+                        >
+                            Continue to Preferences <ArrowRight className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
             </div>
         );
     }
+
+  // Detailed Analysis Screen
+if (quizState === 'analysis' && quizData && results) {
+    return (
+        <QuizAnalysis 
+            quizData={quizData}
+            userAnswers={userAnswers}
+            onBack={handleBackToResults}
+        />
+    );
+}
 
     return null;
 }

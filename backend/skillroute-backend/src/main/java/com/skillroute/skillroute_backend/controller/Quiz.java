@@ -62,7 +62,7 @@ public class Quiz {
 
     /* GET /api/quiz/{id}
      * Returns a specific quiz by ID */
-    @GetMapping("/{id}")
+    @GetMapping("/by-id/{id}")
     public ResponseEntity<QuizRes> getQuizById(
             @PathVariable Long id) {
         try {
