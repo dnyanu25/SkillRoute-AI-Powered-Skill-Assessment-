@@ -12,5 +12,5 @@ public class EvaluateRes {
     private int totalQuestions;
     private String percentage;  // stored as "75.0" to match your toFixed(1)
     private String level;       // "Beginner", "Intermediate", "Advanced"
-    private String reasoning;   // explanati on message
+    private String reasoning;   // explanati on mess age
 }
