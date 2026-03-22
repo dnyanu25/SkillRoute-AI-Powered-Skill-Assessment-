@@ -9,18 +9,30 @@ import PreferencesForm from './preferencesForm';
 
 // Service imports
 import { generateRoadmap } from '../services/aiService';
+import Interview from './Interview';
+
+
+
+
+
 
 export default function GetStarted() {
     const [searchParams] = useSearchParams();
     const [currentStep, setCurrentStep] = useState(1);
     
     // Auto-start quiz if URL has ?startQuiz=true
-    useEffect(() => {
-        if (searchParams.get('startQuiz') === 'true') {
-            setUserInfo({ ...userInfo, skill: 'Demo', level: 'Not sure' });
-            setCurrentStep(2); // Go directly to quiz
-        }
-    }, [searchParams]);
+    // Auto-start quiz or interview based on URL params
+
+useEffect(() => {
+    if (searchParams.get('startQuiz') === 'true') {
+        setUserInfo(prev => ({ ...prev, level: 'Not sure' }));
+        setCurrentStep(1); // Go to skill discovery
+    }
+    
+   
+}, [searchParams]);
+
+
     // User data
     const [userInfo, setUserInfo] = useState({
         skill: '',
@@ -328,6 +340,8 @@ export default function GetStarted() {
 
                 {/* Step 4: Roadmap Display */}
                 {currentStep === 4 && roadmap && <RoadmapDisplay />}
+
+                
             </div>
         </div>
     );

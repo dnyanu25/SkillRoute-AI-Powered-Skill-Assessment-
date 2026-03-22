@@ -1,6 +1,8 @@
 import { PlayCircleIcon, CompassIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import {Link} from 'react-router-dom';
+import { Mic } from "lucide-react";
+
 /**
  * Hero Section component for SkillRoute
  * Main landing section with CTA and animated background
@@ -71,20 +73,25 @@ export default function HeroSection() {
                     viewport={{ once: true }}
                     transition={{ type: "spring", stiffness: 320, damping: 70, mass: 1 }}
                 >
-                    <button className="btn max-md:w-full glass py-3 px-6 flex items-center justify-center gap-2 hover:scale-105 transition-transform">
-                        <CompassIcon className="size-4.5" />
+                     <Link to="/get-started" className="max-md:w-full">
+                      <button className="btn max-md:w-full glass py-3 px-6 flex items-center justify-center gap-2 hover:scale-105 transition-transform">
+                       <CompassIcon className="size-4.5" />
+                     Find Your Path
+                         </button>
+                 </Link>
 
-                        <Link to="/get-started" className="">
-                        Find Your Path
-                    </Link>
-                        
-                    </button>
-                    <Link to="/get-started?startQuiz=true">
-    <button className="btn max-md:w-full glass flex items-center justify-center gap-2 py-3 px-6 hover:scale-105 transition-transform">
-        <PlayCircleIcon className="size-4.5" />
-        Take a Quiz
-    </button>
-</Link>
+            <Link to="/get-started?startQuiz=true" className="max-md:w-full">
+                   <button className="btn max-md:w-full glass flex items-center justify-center gap-2 py-3 px-6 hover:scale-105 transition-transform">
+                       <PlayCircleIcon className="size-4.5" />
+                       Take a Quiz
+                   </button>
+               </Link>
+             <Link to="/interview" className="max-md:w-full">
+               <button className="btn max-md:w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 flex items-center justify-center gap-2 py-3 px-6 hover:scale-105 transition-transform">
+                  <Mic className="size-4.5" />
+                  Take an Interview
+                </button>
+            </Link>
                 </motion.div>
 
                 {/* Optional: Trust indicators */}

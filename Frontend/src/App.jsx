@@ -11,6 +11,7 @@ import Testimonials from "./sections/testimonials";
 import PricingPlans from "./sections/pricing-plans";
 import CallToAction from "./sections/call-to-action";
 import GetStarted from "./sections/GetStarted"
+import Interview from './sections/Interview';
 
 export default function App() {
     return (
@@ -34,6 +35,14 @@ export default function App() {
                 <CallToAction />
             </main>}/>
              <Route path="/get-started" element={<GetStarted/>} />
+
+             <Route path="/interview" element={
+                    <Interview 
+                        skill="React" 
+                        roadmapProgress={80} 
+                        onBack={() => window.location.href = '/'} 
+                    />
+                } />
             </Routes>
             <Footer />
         </>
