@@ -16,7 +16,7 @@ public class Roadmap {
     private Long id;
 
     // ===================================
-    // User Input Fields for roadmap
+    // User Input Fields for roadmap .
     // ===================================
     @Column(nullable = false)
     private String skill;
