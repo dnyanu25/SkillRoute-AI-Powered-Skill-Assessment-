@@ -48,6 +48,6 @@ public class Interview {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        status = "in_progress";  // Default status
+        status = "in_progress";
     }
 }

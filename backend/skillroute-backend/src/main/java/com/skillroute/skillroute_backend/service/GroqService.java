@@ -111,4 +111,38 @@ public class GroqService {
             throw new RuntimeException("Failed to parse AI response as JSON: " + e.getMessage());
         }
     }
+
+    /* Call AI with specific model (for interviews) */
+    public String callAIWithModel(String systemPrompt, String userPrompt, String model) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(groqConfig.getApiKey());
+
+            Map<String, Object> requestBody = Map.of(
+                    "model", model,  // Use the specified model instead of default
+                    "temperature", 0.7,
+                    "max_tokens", 3000,  // More tokens for interview questions
+                    "messages", List.of(
+                            Map.of("role", "system", "content", systemPrompt),
+                            Map.of("role", "user", "content", userPrompt)
+                    )
+            );
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    groqConfig.getApiUrl(),
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
+
+            JsonNode root = objectMapper.readTree(response.getBody());
+            return root.path("choices").get(0).path("message").path("content").asText("");
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get response from AI: " + e.getMessage());
+        }
+    }
 }
