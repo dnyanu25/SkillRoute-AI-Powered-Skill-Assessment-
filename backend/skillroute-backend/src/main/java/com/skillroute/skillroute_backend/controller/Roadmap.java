@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/roadmap")
 @CrossOrigin(origins = "http://localhost:5173")
 public class Roadmap {
-
     @Autowired
     private RoadmapService roadmapService;
 
@@ -43,7 +42,6 @@ public class Roadmap {
             return ResponseEntity.internalServerError().build();
         }
     }
-
     /* GET /api/roadmap/{id}
      * Returns a specific roadmap by ID */
     @GetMapping("/{id}")

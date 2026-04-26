@@ -30,10 +30,9 @@ public class GroqService {
     // Jackson JSON parser — equivalent to JSON.parse() in JS
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // ===================================
-    // callAI() — mirrors your JS function
-    // ===================================
-    /**
+    /*  ===================================
+     callAI() — mirrors your JS function
+     ===================================
      * Generic function to call Groq API
      * Equivalent to callAI() in aiService.js
      */
@@ -58,7 +57,6 @@ public class GroqService {
 
             // Combine headers + body into one HTTP entity
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-
             // Make the POST request to Groq API
             ResponseEntity<String> response = restTemplate.exchange(
                     groqConfig.getApiUrl(),
@@ -66,7 +64,6 @@ public class GroqService {
                     entity,
                     String.class
             );
-
             // Parse the response and extract the message content
             // Mirrors: completion.choices[0]?.message?.content || ""
             JsonNode root = objectMapper.readTree(response.getBody());

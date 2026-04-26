@@ -1,4 +1,4 @@
-import axios from 'axios';
+  import axios from 'axios';
 
 /* Base URL of your Spring Boot backend */
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
@@ -89,7 +89,6 @@ export const generateQuiz = async (skill, difficulty, questionCount) => {
         throw new Error(message);
     }
 };
-
 /* =============================================
    evaluateQuiz()
    Mirrors: old evaluateQuiz(quizData, userAnswers)
@@ -107,14 +106,14 @@ export const evaluateQuiz = async (quizData, userAnswers) => {
         /* Convert userAnswers array to map
          * matching Map<Integer, Integer> in Java */
         const userAnswersMap = {};
-       quizData.questions.forEach((question, index) => {
+        quizData.questions.forEach((question, index) => {
     userAnswersMap[question.id] = userAnswers[index];
 });
 
         const response = await apiClient.post('/api/quiz/evaluate', {
             totalQuestions: quizData.questions.length,
             questions,
-            userAnswers: userAnswersMap,
+            userAnswers: userAnswersMap, 
         });
 
         return response.data;

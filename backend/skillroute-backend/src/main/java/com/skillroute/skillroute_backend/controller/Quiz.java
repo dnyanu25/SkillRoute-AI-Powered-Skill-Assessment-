@@ -13,10 +13,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/quiz")
 @CrossOrigin(origins = "http://localhost:5173")
 public class Quiz {
-
     @Autowired
     private QuizService quizService;
-
     /* POST /api/quiz/generate
      * Receives skill + difficulty + questionCount from React
      * Returns AI generated quiz
@@ -28,14 +26,12 @@ public class Quiz {
             QuizRes response = quizService.generateQuiz(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+            return ResponseEntity.internalServerError().build();  }
     }
-
     /* POST /api/quiz/evaluate
      * Receives quiz answers from React
      * Returns score, level and reasoning
-     * Mirrors: evaluateQuiz(quizData, userAnswers) in React */
+      */
     @PostMapping("/evaluate")
     public ResponseEntity<EvaluateRes> evaluateQuiz(
             @RequestBody EvaluateReq request) {
@@ -43,10 +39,8 @@ public class Quiz {
             EvaluateRes response = quizService.evaluateQuiz(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+            return ResponseEntity.internalServerError().build();  }
     }
-
     /* GET /api/quiz/all
      * Returns all saved quizzes from database */
     @GetMapping("/all")
@@ -57,18 +51,15 @@ public class Quiz {
             );
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
-        }
-    }
-
+        } }
     /* GET /api/quiz/{id}
      * Returns a specific quiz by ID */
-    @GetMapping("/by-id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<QuizRes> getQuizById(
             @PathVariable Long id) {
         try {
             return ResponseEntity.ok(
-                    quizService.getQuizById(id)
-            );
+                    quizService.getQuizById(id) );
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

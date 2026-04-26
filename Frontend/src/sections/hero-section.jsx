@@ -19,9 +19,9 @@ export default function HeroSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
             >
-                <div className="absolute rounded-full top-80 left-2/5 -translate-x-1/2 size-130 bg-[#9D4EDD] blur-[100px]" />
-                <div className="absolute rounded-full top-80 right-0 -translate-x-1/2 size-130 bg-[#5A67D] blur-[100px]" />
-                <div className="absolute rounded-full top-0 left-1/2 -translate-x-1/2 size-130 bg-[#3B82F6] blur-[100px]" />
+                <div className="absolute rounded-full top-80 left-2/5 -translate-x-1/2 size-130 bg-[#1D4EDD] blur-[100px]" />
+                <div className="absolute rounded-full top-80 right-0 -translate-x-1/2 size-130 bg-[#1A67D] blur-[100px]" />
+                <div className="absolute rounded-full top-0 left-1/2 -translate-x-1/2 size-130 bg-[#1B82F6] blur-[100px]" />
             </motion.div>
 
             <motion.section className="flex flex-col items-center px-4">

@@ -9,5 +9,4 @@ public class SkillrouteBackendApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SkillrouteBackendApplication.class, args);
 	}
-
 }

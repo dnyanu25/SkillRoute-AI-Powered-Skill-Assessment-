@@ -6,12 +6,13 @@ import HeroSection from "./sections/hero-section";
 import FaqSection from "./sections/faq-section";
 import TrustedCompanies from "./sections/trusted-companies";
 import Features from "./sections/features";
-import WorkflowSteps from "./sections/workflow-steps"; 
+import WorkflowSteps from "./sections/workflow-steps";
 import Testimonials from "./sections/testimonials";
 import PricingPlans from "./sections/pricing-plans";
 import CallToAction from "./sections/call-to-action";
-import GetStarted from "./sections/GetStarted"
-import Interview from './sections/Interview';
+import GetStarted from "./sections/GetStarted";
+import Interview from './sections/interview/index';
+import InterviewSetup from './sections/interview/InterviewSetup'
 
 export default function App() {
     return (
@@ -23,26 +24,44 @@ export default function App() {
                 <div className="absolute rounded-full top-80 right-0 -translate-x-1/2 size-130 bg-[#2E08CF] blur-[100px]" />
                 <div className="absolute rounded-full top-0 left-1/2 -translate-x-1/2 size-130 bg-[#F26A06] blur-[100px]" />
             </div>
-            <Routes><Route path="/" element={
-            <main className='px-4'>
-                <HeroSection />
-                {/* <TrustedCompanies /> */}
-                <Features  />
-                <WorkflowSteps  />
-                <Testimonials />
-                <FaqSection  />
-                <PricingPlans  />
-                <CallToAction />
-            </main>}/>
-             <Route path="/get-started" element={<GetStarted/>} />
+            <Routes>
+                <Route path="/" element={
+                    <main className='px-4'>
+                        <HeroSection />
+                        {/* <TrustedCompanies /> */}
+                        <Features />
+                        <WorkflowSteps />
+                        <Testimonials />
+                        <FaqSection />
+                        <PricingPlans />
+                        <CallToAction />
+                    </main>
+                } />
+                <Route path="/get-started" element={<GetStarted />} />
+                import InterviewSetup from './sections/interview/InterviewSetup';
+                import Interview from './sections/interview/index';
 
-             <Route path="/interview" element={
-                    <Interview 
-                        skill="React" 
-                        roadmapProgress={80} 
-                        onBack={() => window.location.href = '/'} 
+                // Replace the /interview route with these two:
+                <Route path="/interview" element={
+                    <InterviewSetup
+                        onStart={(config) => {
+                            // store config in sessionStorage, then navigate
+                            sessionStorage.setItem('interviewConfig', JSON.stringify(config));
+                            window.location.href = '/interview/start';
+                        }}
+                        onBack={() => window.location.href = '/'}
                     />
                 } />
+                <Route path="/interview/start" element={(() => {
+                    const config = JSON.parse(sessionStorage.getItem('interviewConfig') || '{}');
+                    return <Interview
+                        skill={config.skill || 'React'}
+                        difficulty={config.difficulty || 3}
+                        questionCount={config.questionCount || 5}
+                        roadmapProgress={80}
+                        onBack={() => window.location.href = '/interview'}
+                    />;
+                })()} />
             </Routes>
             <Footer />
         </>

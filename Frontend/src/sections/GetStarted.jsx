@@ -9,7 +9,7 @@ import PreferencesForm from './preferencesForm';
 
 // Service imports
 import { generateRoadmap } from '../services/aiService';
-import Interview from './Interview';
+import Interview from './interview/index'
 
 
 
@@ -19,18 +19,18 @@ import Interview from './Interview';
 export default function GetStarted() {
     const [searchParams] = useSearchParams();
     const [currentStep, setCurrentStep] = useState(1);
-    
+
     // Auto-start quiz if URL has ?startQuiz=true
     // Auto-start quiz or interview based on URL params
 
-useEffect(() => {
-    if (searchParams.get('startQuiz') === 'true') {
-        setUserInfo(prev => ({ ...prev, level: 'Not sure' }));
-        setCurrentStep(1); // Go to skill discovery
-    }
-    
-   
-}, [searchParams]);
+    useEffect(() => {
+        if (searchParams.get('startQuiz') === 'true') {
+            setUserInfo(prev => ({ ...prev, level: 'Not sure' }));
+            setCurrentStep(1); // Go to skill discovery
+        }
+
+
+    }, [searchParams]);
 
 
     // User data
@@ -44,7 +44,7 @@ useEffect(() => {
         includeRevision: false,
         goals: ''
     });
-    
+
     // Roadmap & UI state
     const [roadmap, setRoadmap] = useState(null);
     const [showCalendar, setShowCalendar] = useState(false);
@@ -54,7 +54,7 @@ useEffect(() => {
     // Handler: Move to next step
     const handleNextStep = (data) => {
         setUserInfo({ ...userInfo, ...data });
-        
+
         if (currentStep === 1 && data.level === 'Not sure') {
             setCurrentStep(2); // Go to quiz
         } else if (currentStep === 1) {
@@ -70,7 +70,7 @@ useEffect(() => {
             setIsLoading(true);
             const finalUserInfo = { ...userInfo, ...preferences };
             setUserInfo(finalUserInfo);
-            
+
             const roadmapData = await generateRoadmap(finalUserInfo);
             setRoadmap(roadmapData);
             setCurrentStep(4); // Show roadmap
@@ -87,10 +87,10 @@ useEffect(() => {
         const updatedRoadmap = { ...roadmap };
         const task = updatedRoadmap.weeks[weekIndex].tasks.find(t => t.id === taskId);
         if (task) task.completed = !task.completed;
-        
+
         const allCompleted = updatedRoadmap.weeks[weekIndex].tasks.every(t => t.completed);
         updatedRoadmap.weeks[weekIndex].completed = allCompleted;
-        
+
         setRoadmap(updatedRoadmap);
     };
 
@@ -110,13 +110,13 @@ useEffect(() => {
         const lastDay = new Date(year, month + 1, 0);
         const daysInMonth = lastDay.getDate();
         const startingDayOfWeek = firstDay.getDay();
-        
+
         return { daysInMonth, startingDayOfWeek, year, month };
     };
 
     const isDateInPlan = (date) => {
         if (!roadmap?.days) return null;
-        return roadmap.days.find(d => 
+        return roadmap.days.find(d =>
             d.date.toDateString() === date.toDateString()
         );
     };
@@ -124,21 +124,20 @@ useEffect(() => {
     const CalendarView = () => {
         const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(currentMonth);
         const days = [];
-        
+
         for (let i = 0; i < startingDayOfWeek; i++) {
             days.push(<div key={`empty-${i}`} className="aspect-square" />);
         }
-        
+
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
             const planDay = isDateInPlan(date);
-            
+
             days.push(
                 <div
                     key={day}
-                    className={`aspect-square flex items-center justify-center rounded-lg relative ${
-                        planDay ? 'cursor-pointer hover:bg-white/10' : ''
-                    }`}
+                    className={`aspect-square flex items-center justify-center rounded-lg relative ${planDay ? 'cursor-pointer hover:bg-white/10' : ''
+                        }`}
                     onClick={() => {
                         if (planDay) {
                             const dayIndex = roadmap.days.findIndex(d => d.date.toDateString() === date.toDateString());
@@ -150,24 +149,23 @@ useEffect(() => {
                         {day}
                     </span>
                     {planDay && (
-                        <CheckCircle2 
-                            className={`absolute top-0.5 right-0.5 w-4 h-4 ${
-                                planDay.completed ? 'text-blue-500' : 'text-gray-600'
-                            }`}
+                        <CheckCircle2
+                            className={`absolute top-0.5 right-0.5 w-4 h-4 ${planDay.completed ? 'text-blue-500' : 'text-gray-600'
+                                }`}
                         />
                     )}
                 </div>
             );
         }
-        
+
         return days;
     };
 
-    const completedTasksCount = roadmap?.weeks.reduce((acc, week) => 
+    const completedTasksCount = roadmap?.weeks.reduce((acc, week) =>
         acc + week.tasks.filter(t => t.completed).length, 0
     ) || 0;
-    
-    const totalTasksCount = roadmap?.weeks.reduce((acc, week) => 
+
+    const totalTasksCount = roadmap?.weeks.reduce((acc, week) =>
         acc + week.tasks.length, 0
     ) || 0;
 
@@ -191,7 +189,7 @@ useEffect(() => {
                         Create New
                     </button>
                 </div>
-                
+
                 <div className="space-y-6">
                     {roadmap.weeks.map((week, weekIdx) => (
                         <div key={weekIdx} className="bg-white/5 rounded-xl p-4 relative">
@@ -203,7 +201,7 @@ useEffect(() => {
                             </h4>
                             <div className="space-y-2">
                                 {week.tasks.map((task) => (
-                                    <div 
+                                    <div
                                         key={task.id}
                                         onClick={() => toggleTask(weekIdx, task.id)}
                                         className="flex items-center gap-3 p-2 hover:bg-white/5 rounded-lg cursor-pointer transition"
@@ -270,9 +268,9 @@ useEffect(() => {
                         <div className="mt-6 p-4 bg-white/5 rounded-lg space-y-2">
                             <p className="text-sm font-semibold">Progress: {completedTasksCount} / {totalTasksCount} tasks</p>
                             <div className="w-full bg-gray-700 rounded-full h-2">
-                                <div 
-                                    className="bg-blue-500 h-2 rounded-full transition-all" 
-                                    style={{ width: `${(completedTasksCount / totalTasksCount) * 100}%` }} 
+                                <div
+                                    className="bg-blue-500 h-2 rounded-full transition-all"
+                                    style={{ width: `${(completedTasksCount / totalTasksCount) * 100}%` }}
                                 />
                             </div>
                         </div>
@@ -285,9 +283,9 @@ useEffect(() => {
                                 {Math.round((completedTasksCount / totalTasksCount) * 100)}%
                             </div>
                             <div className="w-full bg-gray-700 rounded-full h-2 mt-3">
-                                <div 
-                                    className="bg-blue-500 h-2 rounded-full transition-all" 
-                                    style={{ width: `${(completedTasksCount / totalTasksCount) * 100}%` }} 
+                                <div
+                                    className="bg-blue-500 h-2 rounded-full transition-all"
+                                    style={{ width: `${(completedTasksCount / totalTasksCount) * 100}%` }}
                                 />
                             </div>
                         </div>
@@ -313,7 +311,7 @@ useEffect(() => {
             <div className="max-w-7xl mx-auto">
                 {/* Step 1: Skill Discovery */}
                 {currentStep === 1 && (
-                    <SkillDiscovery 
+                    <SkillDiscovery
                         onNext={handleNextStep}
                         initialData={userInfo}
                     />
@@ -321,7 +319,7 @@ useEffect(() => {
 
                 {/* Step 2: Quiz */}
                 {currentStep === 2 && (
-                    <Quiz 
+                    <Quiz
                         skill={userInfo.skill}
                         onComplete={handleNextStep}
                         onBack={() => setCurrentStep(1)}
@@ -330,7 +328,7 @@ useEffect(() => {
 
                 {/* Step 3: Preferences */}
                 {currentStep === 3 && (
-                    <PreferencesForm 
+                    <PreferencesForm
                         userInfo={userInfo}
                         onBack={() => setCurrentStep(1)}
                         onGenerate={handleGenerateRoadmap}
@@ -341,7 +339,7 @@ useEffect(() => {
                 {/* Step 4: Roadmap Display */}
                 {currentStep === 4 && roadmap && <RoadmapDisplay />}
 
-                
+
             </div>
         </div>
     );

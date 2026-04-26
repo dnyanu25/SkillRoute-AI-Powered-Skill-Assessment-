@@ -25,7 +25,10 @@ public class RoadmapService {
     // SYSTEM PROMPT
     // Mirrors: SYSTEM_PROMPTS.roadmapGenerator
     // ===================================
-    private static final String SYSTEM_PROMPT = """
+
+    private static final String SYSTEM_PROMPT =
+            """
+            
             You are an expert learning path designer with years of experience in curriculum development and educational technology.
 
             Your role is to create detailed, practical, and personalized learning roadmaps that:
@@ -44,34 +47,28 @@ public class RoadmapService {
     // ===================================
     public RoadmapRes generateRoadmap(RoadmapReq request) {
         try {
-            // Step 1: Build the prompt
-            // Mirrors: buildRoadmapPrompt(userInfo)
+            /* Step 1: Build the prompt
+             Mirrors: buildRoadmapPrompt(userInfo)*/
             String userPrompt = buildRoadmapPrompt(request);
-
-            // Step 2: Call Groq API
-            // Mirrors: callAI(SYSTEM_PROMPTS.roadmapGenerator, userPrompt)
+            /* Step 2: Call Groq API
+             Mirrors: callAI(SYSTEM_PROMPTS.roadmapGenerator, userPrompt)*/
             String aiResponse = groqService.callAI(SYSTEM_PROMPT, userPrompt);
-
-            // Step 3: Parse JSON response
-            // Mirrors: extractJSON(response)
+            /* Step 3: Parse JSON response
+            // Mirrors: extractJSON(response)*/
             RoadmapRes roadmapData = groqService.extractJSON(aiResponse, RoadmapRes.class);
-
             // Step 4: Save to database
             saveToDatabase(request, aiResponse);
-
             // Step 5: Return parsed roadmap to controller
             return roadmapData;
-
         } catch (Exception e) {
             throw new RuntimeException("Error generating roadmap: " + e.getMessage());
         }
     }
-
-    // ===================================
+    /* ===================================
     // buildRoadmapPrompt()
     // Mirrors: buildRoadmapPrompt() in promptBuilder.js
     // Exact same prompt text!
-    // ===================================
+    // ===================================*/
     private String buildRoadmapPrompt(RoadmapReq req) {
 
         // Build requirements list
@@ -139,7 +136,6 @@ public class RoadmapService {
                 req.getLevel()        // %s - level in Important section
         );
     }
-
     // ===================================
     // Save to Database
     // ===================================
@@ -156,13 +152,10 @@ public class RoadmapService {
         roadmap.setAiResponse(aiResponse);
         roadmapRepository.save(roadmap);
     }
-
-
     /* Get all roadmaps from database */
     public List<Roadmap> getAllRoadmaps() {
         return roadmapRepository.findAll();
     }
-
     /* Get roadmap by ID from database */
     public RoadmapRes getRoadmapById(Long id) {
         Roadmap roadmap = roadmapRepository.findById(id)
@@ -173,5 +166,4 @@ public class RoadmapService {
             throw new RuntimeException("Error parsing roadmap: " + e.getMessage());
         }
     }
-
 }
