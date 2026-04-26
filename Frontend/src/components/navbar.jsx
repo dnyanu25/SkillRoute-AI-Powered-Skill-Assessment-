@@ -56,20 +56,19 @@ export default function Navbar() {
                     ))}
 
                     {isLoggedIn() ? (
-                        /* Logged in — show name + logout */
-                        <div className='flex items-center gap-4'>
-                            <div className='flex items-center gap-2 text-sm text-gray-300'>
-                                <User className='w-4 h-4' />
-                                <span>{user.name}</span>
-                            </div>
-                            <button
-                                onClick={handleLogout}
-                                className='btn glass flex items-center gap-2'
-                            >
-                                <LogOut className='w-4 h-4' />
-                                Logout
-                            </button>
-                        </div>
+    <div className='flex items-center gap-4'>
+        <a href='/profile' className='flex items-center gap-2 text-sm text-gray-300 hover:text-white transition'>
+            <User className='w-4 h-4' />
+            <span>{user.name}</span>
+        </a>
+        <button
+            onClick={handleLogout}
+            className='btn glass flex items-center gap-2'
+        >
+            <LogOut className='w-4 h-4' />
+            Logout
+        </button>
+    </div>
                     ) : (
                         /* Logged out — show login + signup */
                         <div className='flex items-center gap-3'>
@@ -99,10 +98,10 @@ export default function Navbar() {
 
                 {isLoggedIn() ? (
                     <>
-                        <div className='flex items-center gap-2 text-sm text-gray-300'>
-                            <User className='w-4 h-4' />
-                            <span>{user.name}</span>
-                        </div>
+                       <a href='/profile' className='flex items-center gap-2 text-sm text-gray-300 hover:text-white transition'>
+                    <User className='w-4 h-4' />
+                         <span>{user.name}</span>
+</a>
                         <button
                             onClick={handleLogout}
                             className='btn glass flex items-center gap-2'

@@ -17,6 +17,8 @@ import SignupPage from './sections/SignupPage';
 import LoginPage from './sections/LoginPage';
 import ForgotPasswordPage from './sections/ForgotPasswordPage';
 import { useAuth } from './context/AuthContext';
+import ProfilePage from './sections/profile/index';
+
 
 /* Protected route — redirects to login if not logged in */
 function ProtectedRoute({ children }) {
@@ -82,6 +84,12 @@ export default function App() {
                         })()}
                     </ProtectedRoute>
                 } />
+
+                <Route path="/profile" element={
+    <ProtectedRoute>
+        <ProfilePage />
+    </ProtectedRoute>
+} />
             </Routes>
             <Footer />
         </>
