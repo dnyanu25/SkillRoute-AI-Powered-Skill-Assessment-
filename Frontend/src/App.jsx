@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import LenisScroll from "./components/lenis-scroll";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
@@ -12,7 +12,17 @@ import PricingPlans from "./sections/pricing-plans";
 import CallToAction from "./sections/call-to-action";
 import GetStarted from "./sections/GetStarted";
 import Interview from './sections/interview/index';
-import InterviewSetup from './sections/interview/InterviewSetup'
+import InterviewSetup from './sections/interview/InterviewSetup';
+import SignupPage from './sections/SignupPage';
+import LoginPage from './sections/LoginPage';
+import ForgotPasswordPage from './sections/ForgotPasswordPage';
+import { useAuth } from './context/AuthContext';
+
+/* Protected route — redirects to login if not logged in */
+function ProtectedRoute({ children }) {
+    const { isLoggedIn } = useAuth();
+    return isLoggedIn() ? children : <Navigate to="/login" />;
+}
 
 export default function App() {
     return (
@@ -25,10 +35,10 @@ export default function App() {
                 <div className="absolute rounded-full top-0 left-1/2 -translate-x-1/2 size-130 bg-[#F26A06] blur-[100px]" />
             </div>
             <Routes>
+                {/* Public routes */}
                 <Route path="/" element={
                     <main className='px-4'>
                         <HeroSection />
-                        {/* <TrustedCompanies /> */}
                         <Features />
                         <WorkflowSteps />
                         <Testimonials />
@@ -37,31 +47,41 @@ export default function App() {
                         <CallToAction />
                     </main>
                 } />
-                <Route path="/get-started" element={<GetStarted />} />
-                import InterviewSetup from './sections/interview/InterviewSetup';
-                import Interview from './sections/interview/index';
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-                // Replace the /interview route with these two:
-                <Route path="/interview" element={
-                    <InterviewSetup
-                        onStart={(config) => {
-                            // store config in sessionStorage, then navigate
-                            sessionStorage.setItem('interviewConfig', JSON.stringify(config));
-                            window.location.href = '/interview/start';
-                        }}
-                        onBack={() => window.location.href = '/'}
-                    />
+                {/* Protected routes */}
+                <Route path="/get-started" element={
+                    <ProtectedRoute>
+                        <GetStarted />
+                    </ProtectedRoute>
                 } />
-                <Route path="/interview/start" element={(() => {
-                    const config = JSON.parse(sessionStorage.getItem('interviewConfig') || '{}');
-                    return <Interview
-                        skill={config.skill || 'React'}
-                        difficulty={config.difficulty || 3}
-                        questionCount={config.questionCount || 5}
-                        roadmapProgress={80}
-                        onBack={() => window.location.href = '/interview'}
-                    />;
-                })()} />
+                <Route path="/interview" element={
+                    <ProtectedRoute>
+                        <InterviewSetup
+                            onStart={(config) => {
+                                sessionStorage.setItem('interviewConfig', JSON.stringify(config));
+                                window.location.href = '/interview/start';
+                            }}
+                            onBack={() => window.location.href = '/get-started'}
+                        />
+                    </ProtectedRoute>
+                } />
+                <Route path="/interview/start" element={
+                    <ProtectedRoute>
+                        {(() => {
+                            const config = JSON.parse(sessionStorage.getItem('interviewConfig') || '{}');
+                            return <Interview
+                                skill={config.skill}
+                                difficulty={config.difficulty}
+                                questionCount={config.questionCount}
+                                roadmapProgress={80}
+                                onBack={() => window.location.href = '/interview'}
+                            />;
+                        })()}
+                    </ProtectedRoute>
+                } />
             </Routes>
             <Footer />
         </>
