@@ -15,5 +15,8 @@ public interface InterviewRepo extends JpaRepository<Interview, Long> {
     List<Interview> findByStatus(String status);
 
     /* Find all completed interviews (for history) */
-    List<Interview> findByStatusOrderByCreatedAtDesc(String status);
+//    List<Interview> findByStatusOrderByCreatedAtDesc(String status);
+
+
+    List<Interview> findByUserIdOrderByCreatedAtDesc(Long userId);
 }

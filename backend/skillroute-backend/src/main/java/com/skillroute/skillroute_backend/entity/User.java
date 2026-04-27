@@ -24,12 +24,15 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+
+
     /* For forgot password */
     private String resetToken;
     private LocalDateTime resetTokenExpiry;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
 
     @PrePersist
     protected void onCreate() {

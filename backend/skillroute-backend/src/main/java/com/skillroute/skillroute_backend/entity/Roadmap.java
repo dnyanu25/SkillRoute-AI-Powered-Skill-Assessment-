@@ -21,6 +21,10 @@ public class Roadmap {
     @Column(nullable = false)
     private String skill;
 
+    // Add this field
+    @Column
+    private Long userId;
+
     @Column(nullable = false)
     private String level;
 

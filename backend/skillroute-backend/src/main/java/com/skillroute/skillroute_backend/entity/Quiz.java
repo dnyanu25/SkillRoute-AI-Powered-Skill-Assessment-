@@ -24,8 +24,14 @@ public class Quiz {
     @Column(nullable = false)
     private int difficulty;
 
+
+
     @Column(nullable = false)
     private int questionCount;
+
+    // Add this field
+    @Column
+    private Long userId;
 
     // ===================================
     // AI Response Field

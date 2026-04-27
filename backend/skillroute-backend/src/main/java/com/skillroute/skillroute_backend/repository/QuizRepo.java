@@ -12,6 +12,8 @@ public interface QuizRepo extends JpaRepository<Quiz, Long> {
     // SQL: SELECT * FROM quizzes WHERE skill = ?
     List<Quiz> findBySkill(String skill);
 
+    List<Quiz> findByUserIdOrderByCreatedAtDesc(Long userId);
+
     // Find all quizzes by skill and difficulty
     // SQL: SELECT * FROM quizzes WHERE skill = ? AND difficulty = ?
     List<Quiz> findBySkillAndDifficulty(String skill, int difficulty);

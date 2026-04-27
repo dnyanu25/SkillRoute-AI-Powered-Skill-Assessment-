@@ -19,5 +19,4 @@ public interface RoadmapRepo extends JpaRepository<Roadmap, Long> {
 
     // Find most recent roadmap
     // SQL: SELECT * FROM roadmaps ORDER BY created_at DESC LIMIT 1
-    Roadmap findTopByOrderByCreatedAtDesc();
-}
+    List<Roadmap> findByUserIdOrderByCreatedAtDesc(Long userId);}

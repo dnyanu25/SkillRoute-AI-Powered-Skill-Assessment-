@@ -25,6 +25,10 @@ public class Interview {
     @Column(nullable = false)
     private int questionCount;
 
+    // Add this field
+    @Column
+    private Long userId;
+
     /* Interview status */
     @Column(nullable = false)
     private String status;  // "in_progress" or "completed"
