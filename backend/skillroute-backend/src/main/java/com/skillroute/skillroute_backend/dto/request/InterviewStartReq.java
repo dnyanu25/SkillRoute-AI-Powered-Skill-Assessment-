@@ -9,5 +9,6 @@ public class InterviewStartReq {
 
     private String skill;           // e.g., "React"
     private int difficulty;         // 1-5
-    private int questionCount;      // e.g., 5 or 10
+    private int questionCount;
+    private Long userId;  // e.g., 5 or 10
 }
