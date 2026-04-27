@@ -1,18 +1,22 @@
 import { useState, useEffect } from 'react';
 import voiceService from '../../services/voiceService';
-import LoadingScreen from './LoadingScreen';
+import { useAuth } from '../../context/AuthContext'; // ← add authimport LoadingScreen from './LoadingScreen';
 import ProcessingScreen from './ProcessingScreen';
 import IntroScreen from './IntroScreen';
 import QuestionScreen from './QuestionScreen';
 import ResultsScreen from './ResultsScreen';
 
 export default function Interview({
+
+
     skill,
     difficulty,
     questionCount,
     roadmapProgress = 80,
     onBack = () => window.location.href = '/'
 }) {
+
+    const { user } = useAuth();
     const [interviewState, setInterviewState] = useState('intro');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [isListening, setIsListening] = useState(false);
@@ -28,7 +32,7 @@ export default function Interview({
         fetch("http://localhost:8080/api/interviews/start", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ skill, difficulty, questionCount })
+            body: JSON.stringify({ skill, difficulty, questionCount, userId: user?.id })
         })
             .then(res => res.json())
             .then(data => setInterview({
@@ -105,7 +109,8 @@ export default function Interview({
                     questionNumber: currentQuestion.questionNumber,
                     question: currentQuestion.question,
                     userAnswer: answer,
-                    skill: skill
+                    skill: skill,
+                    userId: user?.id
                 })
             });
             const evalData = await res.json();
