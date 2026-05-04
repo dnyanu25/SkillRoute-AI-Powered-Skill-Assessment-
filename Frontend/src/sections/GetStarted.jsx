@@ -71,9 +71,11 @@ export default function GetStarted() {
             const finalUserInfo = { ...userInfo, ...preferences };
             setUserInfo(finalUserInfo);
 
-            const roadmapData = await generateRoadmap(finalUserInfo);
+            // Add userId so roadmap is linked to logged in user
+            const userId = JSON.parse(localStorage.getItem('skillroute_user'))?.id || null;
+            const roadmapData = await generateRoadmap({ ...finalUserInfo, userId });
             setRoadmap(roadmapData);
-            setCurrentStep(4); // Show roadmap
+            setCurrentStep(4);
         } catch (error) {
             alert('Error generating roadmap. Please try again!');
         } finally {
@@ -82,7 +84,7 @@ export default function GetStarted() {
     };
 
     // Handler: Toggle task completion
-    const toggleTask = (weekIndex, taskId) => {
+    const toggleTask = async (weekIndex, taskId) => {
         if (!roadmap) return;
         const updatedRoadmap = { ...roadmap };
         const task = updatedRoadmap.weeks[weekIndex].tasks.find(t => t.id === taskId);
@@ -92,6 +94,30 @@ export default function GetStarted() {
         updatedRoadmap.weeks[weekIndex].completed = allCompleted;
 
         setRoadmap(updatedRoadmap);
+
+        // Save progress to backend if roadmapId exists
+        console.log('roadmapId:', updatedRoadmap.roadmapId);
+
+        if (updatedRoadmap.roadmapId) {
+            const completedTasks = updatedRoadmap.weeks.reduce((acc, week) =>
+                acc + week.tasks.filter(t => t.completed).length, 0);
+            const totalTasks = updatedRoadmap.weeks.reduce((acc, week) =>
+                acc + week.tasks.length, 0);
+
+            try {
+                await fetch('http://localhost:8080/api/roadmap/progress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        roadmapId: updatedRoadmap.roadmapId,
+                        completedTasks,
+                        totalTasks
+                    })
+                });
+            } catch (err) {
+                console.error('Failed to save progress:', err);
+            }
+        }
     };
 
     // Handler: Toggle day completion

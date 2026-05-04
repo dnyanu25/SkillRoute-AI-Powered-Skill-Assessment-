@@ -1,4 +1,4 @@
-  import axios from 'axios';
+import axios from 'axios';  // ← This should be at LINE 1, not line 115
 
 /* Base URL of your Spring Boot backend */
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
@@ -9,7 +9,7 @@ const apiClient = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    timeout: 30000, /* 30 seconds — AI calls can take time */
+    timeout: 30000,
 });
 
 /* =============================================
@@ -28,6 +28,7 @@ export const generateRoadmap = async (userInfo) => {
             includeProjects: userInfo.includeProjects,
             includeRevision: userInfo.includeRevision,
             goals: userInfo.goals,
+            userId: userInfo.userId || null, // ← send userId to backend
         });
 
         const roadmapData = response.data;
@@ -73,12 +74,13 @@ export const generateRoadmap = async (userInfo) => {
    Mirrors: old generateQuiz(skill, difficulty, questionCount)
    Now calls: POST /api/quiz/generate
    ============================================= */
-export const generateQuiz = async (skill, difficulty, questionCount) => {
+export const generateQuiz = async (skill, difficulty, questionCount, userId = null) => {
     try {
         const response = await apiClient.post('/api/quiz/generate', {
             skill,
             difficulty,
             questionCount,
+            userId,
         });
 
         return response.data;
@@ -94,7 +96,7 @@ export const generateQuiz = async (skill, difficulty, questionCount) => {
    Mirrors: old evaluateQuiz(quizData, userAnswers)
    Now calls: POST /api/quiz/evaluate
    ============================================= */
-export const evaluateQuiz = async (quizData, userAnswers) => {
+export const evaluateQuiz = async (quizData, userAnswers, userId = null) => {
     try {
         /* Build questions list with just id and correctAnswer
          * matching EvaluateRequestDTO.QuestionAnswerDTO */
@@ -107,14 +109,19 @@ export const evaluateQuiz = async (quizData, userAnswers) => {
          * matching Map<Integer, Integer> in Java */
         const userAnswersMap = {};
         quizData.questions.forEach((question, index) => {
-    userAnswersMap[question.id] = userAnswers[index];
-});
+            userAnswersMap[question.id] = userAnswers[index];
+        });
+
 
         const response = await apiClient.post('/api/quiz/evaluate', {
+            quizId: quizData.id || null,  // Add this - send quiz ID if available
             totalQuestions: quizData.questions.length,
             questions,
-            userAnswers: userAnswersMap, 
+            userAnswers: userAnswersMap,
+            userId,
         });
+
+
 
         return response.data;
 
