@@ -1,5 +1,4 @@
 import { Mic } from 'lucide-react';
-
 export default function InterviewTab({ interviewHistory }) {
 
     const getScoreColor = (score) => {

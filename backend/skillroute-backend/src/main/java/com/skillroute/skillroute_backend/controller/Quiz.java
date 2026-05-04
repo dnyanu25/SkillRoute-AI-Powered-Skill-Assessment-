@@ -17,8 +17,9 @@ public class Quiz {
     private QuizService quizService;
     /* POST /api/quiz/generate
      * Receives skill + difficulty + questionCount from React
-     * Returns AI generated quiz
+     * Returns AI generated quizc
      * Mirrors: generateQuiz(skill, difficulty, questionCount) in React */
+
     @PostMapping("/generate")
     public ResponseEntity<QuizRes> generateQuiz(
             @RequestBody QuizReq request) {
@@ -26,21 +27,27 @@ public class Quiz {
             QuizRes response = quizService.generateQuiz(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.out.println("Quiz error: " + e.getMessage());
+
             return ResponseEntity.internalServerError().build();  }
+    }
+    @PostMapping("/evaluate")
+    public ResponseEntity<EvaluateRes> evaluateQuiz(@RequestBody EvaluateReq request) {
+        try {
+            EvaluateRes response = quizService.evaluateQuiz(request);
+
+
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("Quiz error: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
     }
     /* POST /api/quiz/evaluate
      * Receives quiz answers from React
      * Returns score, level and reasoning
       */
-    @PostMapping("/evaluate")
-    public ResponseEntity<EvaluateRes> evaluateQuiz(
-            @RequestBody EvaluateReq request) {
-        try {
-            EvaluateRes response = quizService.evaluateQuiz(request);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();  }
-    }
     /* GET /api/quiz/all
      * Returns all saved quizzes from database */
     @GetMapping("/all")
@@ -50,6 +57,8 @@ public class Quiz {
                     quizService.getAllQuizzes()
             );
         } catch (Exception e) {
+            System.out.println("Quiz error: " + e.getMessage());
+
             return ResponseEntity.internalServerError().build();
         } }
     /* GET /api/quiz/{id}
@@ -61,6 +70,8 @@ public class Quiz {
             return ResponseEntity.ok(
                     quizService.getQuizById(id) );
         } catch (Exception e) {
+            System.out.println("Quiz error: " + e.getMessage());
+
             return ResponseEntity.notFound().build();
         }
     }

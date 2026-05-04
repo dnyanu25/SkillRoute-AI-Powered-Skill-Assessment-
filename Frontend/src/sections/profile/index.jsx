@@ -7,6 +7,8 @@ import QuizTab from './tabs/QuizTab';
 import InterviewTab from './tabs/InterviewTab';
 import RoadmapTab from './tabs/RoadmapTab';
 
+import { fetchProfileData } from "./data/mockData";
+
 const TABS = ['Overview', 'Quizzes', 'Interviews', 'Roadmaps'];
 
 export default function ProfilePage() {
@@ -29,30 +31,46 @@ export default function ProfilePage() {
     useEffect(() => {
         if (!user?.id) return;
 
-        fetch(`http://localhost:8080/api/profile/${user.id}`)
-            .then(res => res.json())
-            .then(data => {
-                setStats(data.stats);
-                setQuizHistory(data.quizzes);
-                setInterviewHistory(data.interviews);
-                setRoadmaps(data.roadmaps);
+        const loadProfile = async () => {
+            try {
+                const res = await fetch(`http://localhost:8080/api/profile/${user.id}`);
+                const data = await res.json();
 
-                /* Build recent activity from quizzes + interviews combined */
-                const quizActivity = data.quizzes.map(q => ({
+                // Safe fallback
+                const quizzes = data?.quizzes || [];
+                const interviews = data?.interviews || [];
+                const roadmapsData = data?.roadmaps || [];
+
+                setStats(data?.stats || {
+                    totalQuizzes: 0,
+                    avgQuizScore: 0,
+                    totalInterviews: 0,
+                    avgInterviewScore: 0,
+                    skillsLearning: 0
+                });
+
+                setQuizHistory(quizzes);
+                setInterviewHistory(interviews);
+                setRoadmaps(roadmapsData);
+
+                /* Safe recent activity */
+                const quizActivity = quizzes.map(q => ({
                     id: `quiz-${q.id}`,
                     type: 'quiz',
                     skill: q.skill,
                     score: q.score,
                     date: q.date
                 }));
-                const interviewActivity = data.interviews.map(i => ({
+
+                const interviewActivity = interviews.map(i => ({
                     id: `interview-${i.id}`,
                     type: 'interview',
                     skill: i.skill,
                     score: i.score,
                     date: i.date
                 }));
-                const roadmapActivity = data.roadmaps.map(r => ({
+
+                const roadmapActivity = roadmapsData.map(r => ({
                     id: `roadmap-${r.id}`,
                     type: 'roadmap',
                     skill: r.skill,
@@ -62,15 +80,35 @@ export default function ProfilePage() {
                     date: r.date
                 }));
 
-                /* Combine + sort by date descending, take top 5 */
                 const all = [...quizActivity, ...interviewActivity, ...roadmapActivity]
                     .sort((a, b) => new Date(b.date) - new Date(a.date))
                     .slice(0, 5);
 
                 setRecentActivity(all);
-            })
-            .catch(err => console.error('Failed to load profile:', err))
-            .finally(() => setLoading(false));
+
+            } catch (err) {
+                console.error('Failed to load profile:', err);
+
+                // fallback → no crash
+                setStats({
+                    totalQuizzes: 0,
+                    avgQuizScore: 0,
+                    totalInterviews: 0,
+                    avgInterviewScore: 0,
+                    skillsLearning: 0
+                });
+                setQuizHistory([]);
+                setInterviewHistory([]);
+                setRoadmaps([]);
+                setRecentActivity([]);
+
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadProfile();
+
     }, [user]);
 
     const profileUser = {
@@ -106,11 +144,10 @@ export default function ProfilePage() {
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition ${
-                                activeTab === tab
-                                    ? 'bg-blue-600 text-white'
-                                    : 'text-gray-400 hover:text-white'
-                            }`}
+                            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition ${activeTab === tab
+                                ? 'bg-blue-600 text-white'
+                                : 'text-gray-400 hover:text-white'
+                                }`}
                         >
                             {tab}
                         </button>

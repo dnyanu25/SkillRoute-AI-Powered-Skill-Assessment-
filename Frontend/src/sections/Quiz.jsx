@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { ArrowRight, CheckCircle2, XCircle, ArrowLeft, FileText } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ArrowLeft, FileText } from 'lucide-react';
 import { generateQuiz, evaluateQuiz } from '../services/aiService';
 import QuizAnalysis from './QuizAnalysis';
 
 export default function Quiz({ skill, onComplete, onBack }) {
-    const [quizState, setQuizState] = useState('setup'); // 'setup', 'loading', 'quiz', 'results', 'analysis'
+    const [quizState, setQuizState] = useState('setup');
     const [difficulty, setDifficulty] = useState(3);
     const [questionCount, setQuestionCount] = useState(10);
     const [quizData, setQuizData] = useState(null);
@@ -15,25 +15,25 @@ export default function Quiz({ skill, onComplete, onBack }) {
     const handleStartQuiz = async () => {
         try {
             setQuizState('loading');
-            const quiz = await generateQuiz(skill, difficulty, questionCount);
+            const userId = JSON.parse(localStorage.getItem('skillroute_user'))?.id || null;
+            const quiz = await generateQuiz(skill, difficulty, questionCount, userId);
             setQuizData(quiz);
             setQuizState('quiz');
         } catch (error) {
+            console.error('Quiz error:', error);
             alert('Error generating quiz. Please try again!');
             setQuizState('setup');
         }
     };
 
     const handleAnswerSelect = (questionIndex, answerIndex) => {
-        setUserAnswers({
-            ...userAnswers,
-            [questionIndex]: answerIndex
-        });
+        setUserAnswers({ ...userAnswers, [questionIndex]: answerIndex });
     };
 
     const handleSubmitQuiz = async () => {
         try {
-            const evaluation = await evaluateQuiz(quizData, userAnswers);
+            const userId = JSON.parse(localStorage.getItem('skillroute_user'))?.id || null;
+            const evaluation = await evaluateQuiz(quizData, userAnswers, userId);
             console.log('Evaluation result:', evaluation);
             setResults(evaluation);
             setQuizState('results');
@@ -43,17 +43,9 @@ export default function Quiz({ skill, onComplete, onBack }) {
         }
     };
 
-    const handleCompleteQuiz = () => {
-        onComplete({ level: results.level });
-    };
-
-    const handleShowAnalysis = () => {
-        setQuizState('analysis');
-    };
-
-    const handleBackToResults = () => {
-        setQuizState('results');
-    };
+    const handleCompleteQuiz = () => onComplete({ level: results.level });
+    const handleShowAnalysis = () => setQuizState('analysis');
+    const handleBackToResults = () => setQuizState('results');
 
     // Setup Screen
     if (quizState === 'setup') {
@@ -62,7 +54,6 @@ export default function Quiz({ skill, onComplete, onBack }) {
                 <h2 className="text-3xl font-bold mb-6 text-center">
                     Skill Assessment Quiz 📝
                 </h2>
-                
                 <div className="space-y-6">
                     <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                         <p className="text-center">
@@ -79,9 +70,7 @@ export default function Quiz({ skill, onComplete, onBack }) {
                         <div className="flex items-center gap-3">
                             <span className="text-sm text-gray-400">1</span>
                             <input
-                                type="range"
-                                min="1"
-                                max="5"
+                                type="range" min="1" max="5"
                                 value={difficulty}
                                 onChange={(e) => setDifficulty(parseInt(e.target.value))}
                                 className="flex-1 accent-blue-500"
@@ -106,11 +95,10 @@ export default function Quiz({ skill, onComplete, onBack }) {
                                 <button
                                     key={num}
                                     onClick={() => setQuestionCount(num)}
-                                    className={`p-4 rounded-lg border-2 transition-all font-semibold ${
-                                        questionCount === num
-                                            ? 'border-blue-500 bg-blue-500/20'
-                                            : 'border-white/20 bg-white/5 hover:border-white/40'
-                                    }`}
+                                    className={`p-4 rounded-lg border-2 transition-all font-semibold ${questionCount === num
+                                        ? 'border-blue-500 bg-blue-500/20'
+                                        : 'border-white/20 bg-white/5 hover:border-white/40'
+                                        }`}
                                 >
                                     {num}
                                 </button>
@@ -120,10 +108,7 @@ export default function Quiz({ skill, onComplete, onBack }) {
 
                     {/* Action Buttons */}
                     <div className="flex gap-3">
-                        <button
-                            onClick={onBack}
-                            className="btn glass px-6 py-3 flex items-center gap-2"
-                        >
+                        <button onClick={onBack} className="btn glass px-6 py-3 flex items-center gap-2">
                             <ArrowLeft className="w-5 h-5" /> Back
                         </button>
                         <button
@@ -158,7 +143,6 @@ export default function Quiz({ skill, onComplete, onBack }) {
 
         return (
             <div className="glass rounded-2xl p-8 max-w-3xl mx-auto">
-                {/* Header */}
                 <div className="mb-6">
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-gray-400">
@@ -169,34 +153,28 @@ export default function Quiz({ skill, onComplete, onBack }) {
                         </span>
                     </div>
                     <div className="w-full bg-gray-700 rounded-full h-2">
-                        <div 
-                            className="bg-blue-500 h-2 rounded-full transition-all" 
-                            style={{ width: `${progress}%` }} 
-                        />
+                        <div className="bg-blue-500 h-2 rounded-full transition-all"
+                            style={{ width: `${progress}%` }} />
                     </div>
                 </div>
 
-                {/* Question */}
                 <div className="mb-8">
                     <h3 className="text-xl font-semibold mb-6">{question.question}</h3>
-                    
                     <div className="space-y-3">
                         {question.options.map((option, index) => (
                             <button
                                 key={index}
                                 onClick={() => handleAnswerSelect(currentQuestion, index)}
-                                className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                                    userAnswers[currentQuestion] === index
-                                        ? 'border-blue-500 bg-blue-500/20'
-                                        : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
-                                }`}
+                                className={`w-full text-left p-4 rounded-lg border-2 transition-all ${userAnswers[currentQuestion] === index
+                                    ? 'border-blue-500 bg-blue-500/20'
+                                    : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
+                                    }`}
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                                        userAnswers[currentQuestion] === index
-                                            ? 'border-blue-500 bg-blue-500'
-                                            : 'border-white/40'
-                                    }`}>
+                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${userAnswers[currentQuestion] === index
+                                        ? 'border-blue-500 bg-blue-500'
+                                        : 'border-white/40'
+                                        }`}>
                                         {userAnswers[currentQuestion] === index && (
                                             <div className="w-2 h-2 rounded-full bg-white" />
                                         )}
@@ -208,17 +186,13 @@ export default function Quiz({ skill, onComplete, onBack }) {
                     </div>
                 </div>
 
-                {/* Navigation */}
                 <div className="flex gap-3">
                     {currentQuestion > 0 && (
-                        <button
-                            onClick={() => setCurrentQuestion(currentQuestion - 1)}
-                            className="btn glass px-6 py-3"
-                        >
+                        <button onClick={() => setCurrentQuestion(currentQuestion - 1)}
+                            className="btn glass px-6 py-3">
                             Previous
                         </button>
                     )}
-                    
                     {currentQuestion < quizData.questions.length - 1 ? (
                         <button
                             onClick={() => setCurrentQuestion(currentQuestion + 1)}
@@ -245,45 +219,29 @@ export default function Quiz({ skill, onComplete, onBack }) {
     if (quizState === 'results' && results) {
         return (
             <div className="glass rounded-2xl p-8 max-w-2xl mx-auto">
-                <h2 className="text-3xl font-bold mb-6 text-center">
-                    Quiz Results 🎯
-                </h2>
-                
+                <h2 className="text-3xl font-bold mb-6 text-center">Quiz Results 🎯</h2>
                 <div className="space-y-6">
-                    {/* Score */}
                     <div className="bg-white/5 rounded-lg p-6 text-center border border-white/10">
                         <p className="text-sm text-gray-400 mb-2">Your Score</p>
-                        <p className="text-5xl font-bold text-blue-400 mb-2">
-                            {results.percentage}%
-                        </p>
+                        <p className="text-5xl font-bold text-blue-400 mb-2">{results.percentage}%</p>
                         <p className="text-gray-300">
                             {results.correctCount} out of {results.totalQuestions} correct
                         </p>
                     </div>
-
-                    {/* Level Assessment */}
                     <div className="bg-white/5 rounded-lg p-6 border border-white/10">
                         <div className="flex items-center gap-3 mb-3">
                             <CheckCircle2 className="w-6 h-6 text-green-500" />
-                            <p className="text-xl font-semibold">
-                                Your Level: {results.level}
-                            </p>
+                            <p className="text-xl font-semibold">Your Level: {results.level}</p>
                         </div>
                         <p className="text-gray-300">{results.reasoning}</p>
                     </div>
-
-                    {/* Action Buttons */}
                     <div className="space-y-3">
-                        <button
-                            onClick={handleShowAnalysis}
-                            className="btn bg-blue-600 hover:bg-blue-700 w-full py-3 flex items-center justify-center gap-2"
-                        >
+                        <button onClick={handleShowAnalysis}
+                            className="btn bg-blue-600 hover:bg-blue-700 w-full py-3 flex items-center justify-center gap-2">
                             <FileText className="w-5 h-5" /> View Detailed Analysis
                         </button>
-                        <button
-                            onClick={handleCompleteQuiz}
-                            className="btn bg-blue-600 hover:bg-blue-700 w-full py-3 flex items-center justify-center gap-2"
-                        >
+                        <button onClick={handleCompleteQuiz}
+                            className="btn bg-blue-600 hover:bg-blue-700 w-full py-3 flex items-center justify-center gap-2">
                             Continue to Preferences <ArrowRight className="w-5 h-5" />
                         </button>
                     </div>
@@ -292,16 +250,16 @@ export default function Quiz({ skill, onComplete, onBack }) {
         );
     }
 
-  // Detailed Analysis Screen
-if (quizState === 'analysis' && quizData && results) {
-    return (
-        <QuizAnalysis 
-            quizData={quizData}
-            userAnswers={userAnswers}
-            onBack={handleBackToResults}
-        />
-    );
-}
+    // Analysis Screen
+    if (quizState === 'analysis' && quizData && results) {
+        return (
+            <QuizAnalysis
+                quizData={quizData}
+                userAnswers={userAnswers}
+                onBack={handleBackToResults}
+            />
+        );
+    }
 
     return null;
 }

@@ -13,8 +13,10 @@ public class QuizRes {
     private String skill;
     private int difficulty;
     private List<QuestionDTO> questions;
+    private int questionCount;
 
-
+    private Long id;      // quiz id from database
+    private Long userId;  // logged in user's id
 
 
     @Getter

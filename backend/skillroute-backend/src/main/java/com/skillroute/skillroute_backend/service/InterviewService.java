@@ -66,6 +66,8 @@ public class InterviewService {
             interview.setQuestionCount(request.getQuestionCount());
             interview.setQuestionsJson(aiResponse);
             interview.setStatus("in_progress");
+            interview.setUserId(request.getUserId()); // ← link interview to logged in user
+
 
             interview = interviewRepo.save(interview);
 
@@ -135,6 +137,7 @@ public class InterviewService {
             if (isLast) {
                 interview.setStatus("completed");
                 interview.setCompletedAt(LocalDateTime.now());
+                interview.setTotalScore(eval.getScore() * 10); // ← save score 0-100
                 interviewRepo.save(interview);
             }
 

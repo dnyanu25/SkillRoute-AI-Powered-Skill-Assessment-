@@ -7,6 +7,8 @@ import lombok.Setter;
 @Setter
 public class QuizReq {
 
+    // Add this ↓
+    private Long userId;  // logged in user's id
     private String skill;
     private int difficulty;
     private int questionCount;

@@ -87,8 +87,8 @@ public class ProfileController {
             map.put("skill", r.getSkill());
             map.put("level", r.getLevel());
             map.put("duration", r.getDuration() + " " + r.getDurationType());
-            map.put("completedTasks", 0);
-            map.put("totalTasks", 0);
+            map.put("completedTasks", r.getCompletedTasks() != null ? r.getCompletedTasks() : 0);
+            map.put("totalTasks", r.getTotalTasks() != null ? r.getTotalTasks() : 0);
             map.put("date", r.getCreatedAt().toLocalDate().toString());
             return map;
         }).toList());
