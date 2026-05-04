@@ -41,6 +41,10 @@ public class Roadmap {
     @Column(columnDefinition = "TEXT")
     private String goals;
 
+    // Track roadmap completion progress
+    private Integer completedTasks = 0;
+    private Integer totalTasks = 0;
+
     // ===================================
     // AI Response Field
     // Stores the full Groq JSON response

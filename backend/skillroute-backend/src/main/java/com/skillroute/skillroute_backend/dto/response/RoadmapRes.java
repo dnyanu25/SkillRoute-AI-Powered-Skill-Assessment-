@@ -13,6 +13,8 @@ public class RoadmapRes {
     private String level;
     private int planDuration;
     private String planType;
+
+    private Long roadmapId;
     private List<WeekDTO> weeks;
 
     @Getter

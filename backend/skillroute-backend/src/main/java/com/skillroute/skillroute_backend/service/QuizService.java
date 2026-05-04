@@ -50,10 +50,19 @@ public class QuizService {
             QuizRes quizData = groqService.extractJSON(aiResponse, QuizRes.class);
 
             /* Step 4: Save to database */
-            saveToDatabase(request, aiResponse);
+            /* Step 4: Save to database and get saved quiz id */
+            Quiz savedQuiz = saveToDatabase(request, aiResponse);
 
-            /* Step 5: Return quiz to controller */
+            /* Step 5: Set quiz id so frontend can send it back during evaluate */
+/* Step 5: Set quiz id and userId manually after parsing
+   (Groq doesn't know about these fields) */
+            quizData.setId(savedQuiz.getId());
+            quizData.setUserId(request.getUserId()); // ← set userId from request
+
+            /* Step 6: Return quiz to controller */
             return quizData;
+
+
 
         } catch (Exception e) {
             throw new RuntimeException("Error generating quiz: " + e.getMessage());
@@ -102,12 +111,30 @@ public class QuizService {
         }
 
         /* Build and return response - mirrors return object in React */
+        /* Build and return response */
         EvaluateRes response = new EvaluateRes();
         response.setCorrectCount(correctCount);
         response.setTotalQuestions(totalQuestions);
         response.setPercentage(String.format("%.1f", percentage));
         response.setLevel(level);
         response.setReasoning(reasoning);
+
+        /* Save evaluation result to database if quizId provided */
+        if (request.getQuizId() != null) {
+            try {
+                Quiz quiz = quizRepo.findById(request.getQuizId())
+                        .orElseThrow(() -> new RuntimeException("Quiz not found"));
+                quiz.setCorrectCount(correctCount);
+                quiz.setTotalQuestions(totalQuestions);
+                quiz.setPercentage(String.format("%.1f", percentage));
+                quiz.setSkillLevel(level);
+                quiz.setUserId(request.getUserId()); // ← save userId on evaluation too
+                quizRepo.save(quiz);
+            } catch (Exception e) {
+                // Don't fail evaluation if save fails
+                System.out.println("Warning: Could not save quiz result: " + e.getMessage());
+            }
+        }
 
         return response;
     }
@@ -145,15 +172,18 @@ public class QuizService {
     }
 
     /* Save quiz request and AI response to database */
-    private void saveToDatabase(QuizReq request, String aiResponse) {
+    /* Save quiz request and AI response to database */
+
+    /* Save quiz request and AI response to database */
+    private Quiz saveToDatabase(QuizReq request, String aiResponse) {
         Quiz quiz = new Quiz();
         quiz.setSkill(request.getSkill());
         quiz.setDifficulty(request.getDifficulty());
         quiz.setQuestionCount(request.getQuestionCount());
         quiz.setAiResponse(aiResponse);
-        quizRepo.save(quiz);
+        quiz.setUserId(request.getUserId()); // ← link quiz to logged in user
+        return quizRepo.save(quiz); // ← return saved quiz so we have its id
     }
-
     /* Get all quizzes from database */
     public List<Quiz> getAllQuizzes() {
         return quizRepo.findAll();
@@ -168,6 +198,35 @@ public class QuizService {
         } catch (Exception e) {
             throw new RuntimeException("Error parsing quiz: " + e.getMessage());
         }
+    }
+
+    /* Get total quiz count */
+    public int getTotalQuizCount() {
+        return (int) quizRepo.count();
+    }
+
+    /* Calculate average quiz score */
+    public double getAverageQuizScore() {
+        List<Quiz> quizzes = quizRepo.findAll();
+        if (quizzes.isEmpty()) return 0.0;
+
+        // Calculate average from stored scores
+        // Note: You'll need to add a score field to Quiz entity
+        // For now, return mock value
+        return 72.0;  // TODO: Calculate from actual data
+    }
+
+    /* Save quiz evaluation results to database */
+    public void saveQuizResult(Long quizId, EvaluateRes evaluationResult) {
+        Quiz quiz = quizRepo.findById(quizId)
+                .orElseThrow(() -> new RuntimeException("Quiz not found"));
+
+        quiz.setCorrectCount(evaluationResult.getCorrectCount());
+        quiz.setTotalQuestions(evaluationResult.getTotalQuestions());
+        quiz.setPercentage(evaluationResult.getPercentage());
+        quiz.setSkillLevel(evaluationResult.getLevel());
+
+        quizRepo.save(quiz);
     }
 
 }

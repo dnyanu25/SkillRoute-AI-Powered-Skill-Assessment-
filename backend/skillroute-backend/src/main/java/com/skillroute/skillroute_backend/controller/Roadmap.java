@@ -1,11 +1,14 @@
 package com.skillroute.skillroute_backend.controller;
 
 import com.skillroute.skillroute_backend.dto.request.RoadmapReq;
+import com.skillroute.skillroute_backend.dto.request.UpdateRoadmapReq;
 import com.skillroute.skillroute_backend.dto.response.RoadmapRes;
 import com.skillroute.skillroute_backend.service.RoadmapService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/roadmap")
@@ -29,6 +32,18 @@ public class Roadmap {
         }
     }
 
+
+    /* POST /api/roadmap/progress
+   Called when user checks/unchecks a task */
+    @PostMapping("/progress")
+    public ResponseEntity<?> updateProgress(@RequestBody UpdateRoadmapReq request) {
+        try {
+            roadmapService.updateProgress(request);
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
     /* GET /api/roadmap/all
      * Returns all saved roadmaps from database
      * Useful for history/dashboard feature */

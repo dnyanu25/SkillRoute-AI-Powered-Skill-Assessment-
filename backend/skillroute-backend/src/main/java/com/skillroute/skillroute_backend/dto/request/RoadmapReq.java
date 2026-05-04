@@ -15,6 +15,8 @@ public class RoadmapReq {
     private boolean includeProjects;
     private boolean includeRevision;
     private String goals;
+    private Long userId;  // logged in user's id
+
 
     // optional, can be null
 }

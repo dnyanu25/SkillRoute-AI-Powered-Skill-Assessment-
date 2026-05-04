@@ -1,6 +1,7 @@
 package com.skillroute.skillroute_backend.service;
 
 import com.skillroute.skillroute_backend.dto.request.RoadmapReq;
+import com.skillroute.skillroute_backend.dto.request.UpdateRoadmapReq;
 import com.skillroute.skillroute_backend.dto.response.RoadmapRes;
 import com.skillroute.skillroute_backend.entity.Roadmap;
 import com.skillroute.skillroute_backend.repository.RoadmapRepo;
@@ -21,14 +22,8 @@ public class RoadmapService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // ===================================
-    // SYSTEM PROMPT
-    // Mirrors: SYSTEM_PROMPTS.roadmapGenerator
-    // ===================================
-
     private static final String SYSTEM_PROMPT =
             """
-            
             You are an expert learning path designer with years of experience in curriculum development and educational technology.
 
             Your role is to create detailed, practical, and personalized learning roadmaps that:
@@ -41,38 +36,34 @@ public class RoadmapService {
             Always respond with valid JSON only, no markdown formatting or extra text.
             """;
 
-    // ===================================
-    // generateRoadmap()
-    // Mirrors: generateRoadmap(userInfo) in aiService.js
-    // ===================================
+    /* generateRoadmap() */
     public RoadmapRes generateRoadmap(RoadmapReq request) {
         try {
-            /* Step 1: Build the prompt
-             Mirrors: buildRoadmapPrompt(userInfo)*/
+            /* Step 1: Build prompt */
             String userPrompt = buildRoadmapPrompt(request);
-            /* Step 2: Call Groq API
-             Mirrors: callAI(SYSTEM_PROMPTS.roadmapGenerator, userPrompt)*/
+
+            /* Step 2: Call Groq API */
             String aiResponse = groqService.callAI(SYSTEM_PROMPT, userPrompt);
-            /* Step 3: Parse JSON response
-            // Mirrors: extractJSON(response)*/
+
+            /* Step 3: Parse JSON response */
             RoadmapRes roadmapData = groqService.extractJSON(aiResponse, RoadmapRes.class);
-            // Step 4: Save to database
-            saveToDatabase(request, aiResponse);
-            // Step 5: Return parsed roadmap to controller
+
+            /* Step 4: Save to database and get saved entity */
+            Roadmap saved = saveToDatabase(request, aiResponse);
+
+            /* Step 5: Set roadmapId so frontend can send progress updates */
+            roadmapData.setRoadmapId(saved.getId());
+
+            /* Step 6: Return parsed roadmap to controller */
             return roadmapData;
+
         } catch (Exception e) {
             throw new RuntimeException("Error generating roadmap: " + e.getMessage());
         }
     }
-    /* ===================================
-    // buildRoadmapPrompt()
-    // Mirrors: buildRoadmapPrompt() in promptBuilder.js
-    // Exact same prompt text!
-    // ===================================*/
-    private String buildRoadmapPrompt(RoadmapReq req) {
 
-        // Build requirements list
-        // Mirrors: const requirements = []
+    /* buildRoadmapPrompt() */
+    private String buildRoadmapPrompt(RoadmapReq req) {
         StringBuilder requirements = new StringBuilder();
         if (req.isIncludePractice()) {
             requirements.append("\n- Include practice questions for each topic");
@@ -84,14 +75,10 @@ public class RoadmapService {
             requirements.append("\n- Include revision periods to reinforce learning");
         }
 
-        // Build goals text
-        // Mirrors: const goalsText = goals ? `\nSpecific Goals: ${goals}` : ''
         String goalsText = (req.getGoals() != null && !req.getGoals().isEmpty())
                 ? "\nSpecific Goals: " + req.getGoals()
                 : "";
 
-        // Build final prompt
-        // Mirrors the exact template literal from promptBuilder.js
         return String.format("""
                 Create a comprehensive learning roadmap for %s at %s level.
 
@@ -123,23 +110,22 @@ public class RoadmapService {
                 - Tasks should build upon previous weeks
                 - Include hands-on learning activities
                 - Return ONLY valid JSON, no markdown formatting""",
-                req.getSkill(),       // %s - skill name
-                req.getLevel(),       // %s - level
-                req.getDuration(),    // %d - duration number
-                req.getDurationType(), // %s - weeks/months
-                requirements,         // %s - requirements list
-                goalsText,            // %s - goals
-                req.getSkill(),       // %s - skill in JSON template
-                req.getLevel(),       // %s - level in JSON template
-                req.getDuration(),    // %d - planDuration in JSON template
-                req.getDurationType(), // %s - planType in JSON template
-                req.getLevel()        // %s - level in Important section
+                req.getSkill(),
+                req.getLevel(),
+                req.getDuration(),
+                req.getDurationType(),
+                requirements,
+                goalsText,
+                req.getSkill(),
+                req.getLevel(),
+                req.getDuration(),
+                req.getDurationType(),
+                req.getLevel()
         );
     }
-    // ===================================
-    // Save to Database
-    // ===================================
-    private void saveToDatabase(RoadmapReq request, String aiResponse) {
+
+    /* Save to database — returns saved entity so we can get its id */
+    private Roadmap saveToDatabase(RoadmapReq request, String aiResponse) {
         Roadmap roadmap = new Roadmap();
         roadmap.setSkill(request.getSkill());
         roadmap.setLevel(request.getLevel());
@@ -150,12 +136,24 @@ public class RoadmapService {
         roadmap.setIncludeRevision(request.isIncludeRevision());
         roadmap.setGoals(request.getGoals());
         roadmap.setAiResponse(aiResponse);
+        roadmap.setUserId(request.getUserId()); // ← link to logged in user
+        return roadmapRepository.save(roadmap); // ← return saved entity
+    }
+
+    /* Update roadmap task completion progress */
+    public void updateProgress(UpdateRoadmapReq request) {
+        Roadmap roadmap = roadmapRepository.findById(request.getRoadmapId())
+                .orElseThrow(() -> new RuntimeException("Roadmap not found"));
+        roadmap.setCompletedTasks(request.getCompletedTasks());
+        roadmap.setTotalTasks(request.getTotalTasks());
         roadmapRepository.save(roadmap);
     }
+
     /* Get all roadmaps from database */
     public List<Roadmap> getAllRoadmaps() {
         return roadmapRepository.findAll();
     }
+
     /* Get roadmap by ID from database */
     public RoadmapRes getRoadmapById(Long id) {
         Roadmap roadmap = roadmapRepository.findById(id)

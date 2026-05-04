@@ -29,7 +29,10 @@ export default function RoadmapTab({ roadmaps }) {
             ) : (
                 <div className="space-y-4">
                     {roadmaps.map((roadmap) => {
-                        const percent = Math.round((roadmap.completedTasks / roadmap.totalTasks) * 100);
+                        // Avoid NaN when totalTasks is 0
+                        const percent = roadmap.totalTasks > 0
+                            ? Math.round((roadmap.completedTasks / roadmap.totalTasks) * 100)
+                            : 0;
                         return (
                             <div key={roadmap.id} className="bg-white/5 rounded-xl p-5 border border-white/10">
 
