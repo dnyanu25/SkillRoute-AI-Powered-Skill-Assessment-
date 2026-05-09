@@ -31,23 +31,21 @@ public class Quiz {
 
             return ResponseEntity.internalServerError().build();  }
     }
+    /* POST /api/quiz/evaluate
+     * Receives quiz answers from React
+     * Returns score, level and reasoning
+     */
     @PostMapping("/evaluate")
     public ResponseEntity<EvaluateRes> evaluateQuiz(@RequestBody EvaluateReq request) {
         try {
             EvaluateRes response = quizService.evaluateQuiz(request);
-
-
-
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.out.println("Quiz error: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }
-    /* POST /api/quiz/evaluate
-     * Receives quiz answers from React
-     * Returns score, level and reasoning
-      */
+
     /* GET /api/quiz/all
      * Returns all saved quizzes from database */
     @GetMapping("/all")

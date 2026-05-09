@@ -12,10 +12,8 @@ public class EvaluateReq {
     private int totalQuestions;
     private Map<Integer, Integer> userAnswers;
     private List<QuestionAnswerDTO> questions;
-
     private Long quizId;
 
-    // Add this ↓
     private Long userId;  // logged in user's id
     /* Inner class */
 
